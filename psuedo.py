@@ -36,14 +36,15 @@ def chi_test(arr):
         E_i = N / M
         chi2 += (y[i] - E_i)**2 / E_i
     return chi2, M
-    
-SEEDS = [1, 2022] 
-av_chi = np.zeros(len(SEEDS)) # average chi^2 for each of 3 generators
+
+
+SEEDS = [1, 2022]
+av_chi = np.zeros(len(SEEDS)) # average chi^2 for each of 2 generators
 corr_arr_pc = []
 corr_arr_ph = []
-corr_arr_mt = []
 
-pc = generate_(20000, np.random.PCG64(2022))
+"""
+pc = generate_(20000, np.random.Philox(1))
 plt.figure()
 plt.hist(pc)
 plt.xlabel("Number value")
@@ -53,17 +54,26 @@ plt.show()
 for i in range(len(SEEDS)):
     pc = generate_(20000, np.random.PCG64(SEEDS[i]))
     ph = generate_(20000, np.random.Philox(SEEDS[i]))
-    mt = generate_(20000, np.random.MT19937(SEEDS[i]))
     av_chi[0] += chi_test(pc)[0] / len(SEEDS)
     av_chi[1] += chi_test(ph)[0] / len(SEEDS)
-    av_chi[2] += chi_test(mt)[0] / len(SEEDS)
-    
+
     corr_arr_pc.append(np.correlate(pc, pc, 'same'))
     corr_arr_ph.append(np.correlate(ph, ph, 'same'))
-    corr_arr_mt.append(np.correlate(mt, mt, 'same'))
-
-fig = plt.figure()
-plt.title('Correlation')
-plt.plot(corr_arr_pc[0])
+print("Average chi squared PCG64, Philox: ", av_chi)
+print(corr_arr_pc[0])
+# auto correlation plots
+fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
+fig.tight_layout()
+ax1.plot(corr_arr_pc[0])
+ax1.set_title('Auto-correlation PCG64')
+ax1.legend(['Seed = 1'])
+ax2.plot(corr_arr_pc[1])
+ax2.set_title('Auto-correlation PCG64')
+ax2.legend(['Seed = 2022'])
+ax3.plot(corr_arr_ph[0])
+ax3.set_title('Auto-correlation Philox')
+ax3.legend(['Seed = 1'])
+ax4.plot(corr_arr_ph[1])
+ax4.set_title('Auto-correlation Philox')
+ax4.legend(['Seed = 2022'])
 plt.show()
-"""
