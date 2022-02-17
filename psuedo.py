@@ -40,10 +40,10 @@ def chi_test(arr):
 
 SEEDS = [1, 2022]
 av_chi = np.zeros(len(SEEDS)) # average chi^2 for each of 2 generators
-corr_arr_pc = []
-corr_arr_ph = []
+corr_arr_pc = [] # PCG64 correlation array
+corr_arr_ph = [] # Philox correlation array
 
-"""
+"""Used to create histograms
 pc = generate_(20000, np.random.Philox(1))
 plt.figure()
 plt.hist(pc)
@@ -54,13 +54,13 @@ plt.show()
 for i in range(len(SEEDS)):
     pc = generate_(20000, np.random.PCG64(SEEDS[i]))
     ph = generate_(20000, np.random.Philox(SEEDS[i]))
-    av_chi[0] += chi_test(pc)[0] / len(SEEDS)
-    av_chi[1] += chi_test(ph)[0] / len(SEEDS)
+    av_chi[0] += chi_test(pc)[0] / len(SEEDS) # average the chi squared tests
+    av_chi[1] += chi_test(ph)[0] / len(SEEDS) # "                            "
+    corr_arr_pc.append(np.correlate(pc, pc, 'same')) # calculate auto correlations
+    corr_arr_ph.append(np.correlate(ph, ph, 'same')) # "                         "
 
-    corr_arr_pc.append(np.correlate(pc, pc, 'same'))
-    corr_arr_ph.append(np.correlate(ph, ph, 'same'))
 print("Average chi squared PCG64, Philox: ", av_chi)
-print(corr_arr_pc[0])
+
 # auto correlation plots
 fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
 fig.tight_layout()
